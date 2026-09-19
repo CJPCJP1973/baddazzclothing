@@ -39,6 +39,15 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
+          {signedIn && (
+            <Link
+              to="/orders"
+              className="text-muted-foreground transition-colors hover:text-foreground"
+              activeProps={{ className: "text-foreground" }}
+            >
+              Orders
+            </Link>
+          )}
         </nav>
         <div className="flex items-center gap-2">
           <Link
