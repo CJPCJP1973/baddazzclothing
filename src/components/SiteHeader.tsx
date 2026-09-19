@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import logo from "@/assets/logo.png";
 import { CartDrawer } from "@/components/CartDrawer";
+import { supabase } from "@/integrations/supabase/client";
 
 const links = [
   { to: "/", label: "Home" },
