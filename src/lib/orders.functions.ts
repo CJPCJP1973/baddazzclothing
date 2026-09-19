@@ -104,7 +104,8 @@ export const listPendingOrders = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<OrdersResult> => {
     await assertAdmin(context as never);
 
-    const token = process.env["SHOPIFY_ADMIN_ACCESS_TOKEN"];
+    // Prefer the connected store's Admin API token; fall back to a user-supplied one.
+    const token = process.env["SHOPIFY_ACCESS_TOKEN"] ?? process.env["SHOPIFY_ADMIN_ACCESS_TOKEN"];
     if (!token) {
       return { orders: [], error: "missing_token" };
     }
