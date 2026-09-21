@@ -41,11 +41,11 @@ export function SiteHeader() {
           ))}
           {signedIn && (
             <Link
-              to="/orders"
+              to="/admin"
               className="text-muted-foreground transition-colors hover:text-foreground"
               activeProps={{ className: "text-foreground" }}
             >
-              Orders
+              Admin
             </Link>
           )}
         </nav>

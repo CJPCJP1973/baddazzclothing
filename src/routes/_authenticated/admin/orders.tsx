@@ -1,20 +1,18 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
-import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/shopify";
 import { listPendingOrders, type DashboardOrder } from "@/lib/orders.functions";
+import { AdminError } from "@/components/AdminError";
 
-export const Route = createFileRoute("/_authenticated/orders")({
+export const Route = createFileRoute("/_authenticated/admin/orders")({
   head: () => ({
     meta: [
-      { title: "Order dashboard | Baddazz Clothing" },
+      { title: "Orders | Baddazz Clothing admin" },
       { name: "description", content: "Pending orders, print status and shipping tracking for Baddazz Clothing." },
-      { property: "og:title", content: "Order dashboard | Baddazz Clothing" },
+      { property: "og:title", content: "Orders | Baddazz Clothing admin" },
       { property: "og:description", content: "Pending orders, print status and shipping tracking." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -35,12 +33,12 @@ const PRINT_STAGE: Record<string, { label: string; tone: string }> = {
 };
 
 function stage(status: string) {
-  return PRINT_STAGE[status] ?? { label: status.toLowerCase().replace(/_/g, " "), tone: "bg-muted text-muted-foreground" };
+  return (
+    PRINT_STAGE[status] ?? { label: status.toLowerCase().replace(/_/g, " "), tone: "bg-muted text-muted-foreground" }
+  );
 }
 
 function OrdersPage() {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const fetchOrders = useServerFn(listPendingOrders);
   const [scope, setScope] = useState<"pending" | "all">("pending");
 
@@ -49,44 +47,13 @@ function OrdersPage() {
     queryFn: () => fetchOrders({ data: { scope } }),
   });
 
-  async function signOut() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
-  }
-
   const orders = data?.orders ?? [];
   const error = data?.error ?? null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <SiteHeader />
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="font-display text-4xl tracking-wide uppercase sm:text-5xl">Orders</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Live from your Shopify store — print stage and tracking for every order.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => refetch()}
-              className="rounded border border-border px-3 py-2 text-xs tracking-widest uppercase hover:border-primary"
-            >
-              {isFetching ? "Refreshing…" : "Refresh"}
-            </button>
-            <button
-              onClick={signOut}
-              className="rounded border border-border px-3 py-2 text-xs tracking-widest text-muted-foreground uppercase hover:text-foreground"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-6 flex gap-2">
+    <div className="mt-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex gap-2">
           {(["pending", "all"] as const).map((value) => (
             <button
               key={value}
@@ -101,44 +68,33 @@ function OrdersPage() {
             </button>
           ))}
         </div>
+        <button
+          onClick={() => refetch()}
+          className="rounded border border-border px-3 py-2 text-xs tracking-widest uppercase hover:border-primary"
+        >
+          {isFetching ? "Refreshing…" : "Refresh"}
+        </button>
+      </div>
 
-        {error === "missing_token" && (
-          <p className="mt-8 rounded border border-border bg-card p-6 text-sm text-muted-foreground">
-            Your Shopify order access token hasn't been saved yet. Once you add it, this page fills with real orders.
-          </p>
-        )}
-        {(error === "unauthorized" || error === "scope") && (
-          <p className="mt-8 rounded border border-destructive/40 bg-card p-6 text-sm text-muted-foreground">
-            Shopify refused the order request. Check that the access token is correct and that the app has permission
-            to read orders and fulfilments.
-          </p>
-        )}
-        {error && !["missing_token", "unauthorized", "scope"].includes(error) && (
-          <p className="mt-8 rounded border border-destructive/40 bg-card p-6 text-sm text-muted-foreground">
-            Couldn't load orders: {error}
-          </p>
-        )}
-        {isError && (
-          <p className="mt-8 rounded border border-destructive/40 bg-card p-6 text-sm text-muted-foreground">
-            You don't have access to this page, or the connection failed. Try signing out and back in.
-          </p>
-        )}
+      {error && <AdminError error={error} />}
+      {isError && (
+        <p className="mt-8 rounded border border-destructive/40 bg-card p-6 text-sm text-muted-foreground">
+          You don't have access to this page, or the connection failed. Try signing out and back in.
+        </p>
+      )}
+      {isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading orders…</p>}
 
-        {isLoading && <p className="mt-8 text-sm text-muted-foreground">Loading orders…</p>}
+      {!isLoading && !error && orders.length === 0 && (
+        <p className="mt-8 rounded border border-border bg-card p-6 text-sm text-muted-foreground">
+          {scope === "pending" ? "Nothing waiting — every order has been fulfilled." : "No orders yet."}
+        </p>
+      )}
 
-        {!isLoading && !error && orders.length === 0 && (
-          <p className="mt-8 rounded border border-border bg-card p-6 text-sm text-muted-foreground">
-            {scope === "pending" ? "Nothing waiting — every order has been fulfilled." : "No orders yet."}
-          </p>
-        )}
-
-        <div className="mt-8 space-y-4">
-          {orders.map((order) => (
-            <OrderCard key={order.id} order={order} />
-          ))}
-        </div>
-      </main>
-      <SiteFooter />
+      <div className="mt-8 space-y-4">
+        {orders.map((order) => (
+          <OrderCard key={order.id} order={order} />
+        ))}
+      </div>
     </div>
   );
 }
