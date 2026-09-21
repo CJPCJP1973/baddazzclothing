@@ -79,7 +79,10 @@ function DiscountsPage() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            if (!code.trim()) return toast.error("Give the code a name, like BADDAZZ10");
+            if (!code.trim()) {
+              toast.error("Give the code a name, like BADDAZZ10");
+              return;
+            }
             createMutation.mutate();
           }}
           className="mt-4 grid gap-4 sm:grid-cols-4"
