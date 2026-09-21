@@ -36,7 +36,7 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin + "/orders" },
+          options: { emailRedirectTo: window.location.origin + "/admin" },
         });
         if (error) throw error;
         if (!data.session) {
@@ -48,7 +48,7 @@ function AuthPage() {
         if (error) throw error;
       }
       await supabase.rpc("claim_first_admin");
-      navigate({ to: "/orders" });
+      navigate({ to: "/admin" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     } finally {

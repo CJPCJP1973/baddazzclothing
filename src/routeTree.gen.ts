@@ -15,7 +15,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
-import { Route as AuthenticatedOrdersRouteImport } from './routes/_authenticated/orders'
 import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminDiscountsRouteImport } from './routes/_authenticated/admin/discounts'
@@ -49,11 +48,6 @@ const ShopRoute = ShopRouteImport.update({
 const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedOrdersRoute = AuthenticatedOrdersRouteImport.update({
-  id: '/orders',
-  path: '/orders',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const ProductHandleRoute = ProductHandleRouteImport.update({
@@ -91,7 +85,6 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/shop': typeof ShopRoute
   '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
-  '/orders': typeof AuthenticatedOrdersRoute
   '/product/$handle': typeof ProductHandleRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -103,7 +96,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/shop': typeof ShopRoute
-  '/orders': typeof AuthenticatedOrdersRoute
   '/product/$handle': typeof ProductHandleRoute
   '/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
   '/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -118,7 +110,6 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/shop': typeof ShopRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
-  '/_authenticated/orders': typeof AuthenticatedOrdersRoute
   '/product/$handle': typeof ProductHandleRoute
   '/_authenticated/admin/discounts': typeof AuthenticatedAdminDiscountsRoute
   '/_authenticated/admin/orders': typeof AuthenticatedAdminOrdersRoute
@@ -133,7 +124,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/shop'
     | '/admin'
-    | '/orders'
     | '/product/$handle'
     | '/admin/discounts'
     | '/admin/orders'
@@ -145,7 +135,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/shop'
-    | '/orders'
     | '/product/$handle'
     | '/admin/discounts'
     | '/admin/orders'
@@ -159,7 +148,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/shop'
     | '/_authenticated/admin'
-    | '/_authenticated/orders'
     | '/product/$handle'
     | '/_authenticated/admin/discounts'
     | '/_authenticated/admin/orders'
@@ -218,13 +206,6 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/orders': {
-      id: '/_authenticated/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof AuthenticatedOrdersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/product/$handle': {
@@ -287,12 +268,10 @@ const AuthenticatedAdminRouteRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
-  AuthenticatedOrdersRoute: typeof AuthenticatedOrdersRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
-  AuthenticatedOrdersRoute: AuthenticatedOrdersRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
