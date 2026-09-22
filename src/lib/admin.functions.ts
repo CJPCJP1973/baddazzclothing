@@ -408,3 +408,74 @@ export const deleteDiscount = createServerFn({ method: "POST" })
     if (userError) return { ok: false, error: userError };
     return { ok: true, error: null };
   });
+
+/* ------------------------------------ apps ----------------------------------- */
+
+export interface InstalledApp {
+  id: string;
+  title: string;
+  handle: string | null;
+  developerName: string | null;
+  description: string | null;
+  launchUrl: string | null;
+  developerWebsiteUrl: string | null;
+}
+
+const APPS_QUERY = /* GraphQL */ `
+  query InstalledApps {
+    appInstallations(first: 100) {
+      edges {
+        node {
+          id
+          launchUrl
+          app {
+            id
+            title
+            handle
+            description
+            developerName
+            developerWebsiteUrl
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const listInstalledApps = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ apps: InstalledApp[]; error: string | null }> => {
+    await assertAdmin(context as never);
+    const { data, error } = await adminGraphql<{
+      appInstallations: {
+        edges: Array<{
+          node: {
+            id: string;
+            launchUrl: string | null;
+            app: {
+              id: string;
+              title: string;
+              handle: string | null;
+              description: string | null;
+              developerName: string | null;
+              developerWebsiteUrl: string | null;
+            } | null;
+          };
+        }>;
+      };
+    }>(APPS_QUERY);
+    if (error) return { apps: [], error };
+    const apps = (data?.appInstallations?.edges ?? [])
+      .filter((edge) => edge.node.app)
+      .map((edge) => ({
+        id: edge.node.id,
+        launchUrl: edge.node.launchUrl,
+        title: edge.node.app!.title,
+        handle: edge.node.app!.handle,
+        developerName: edge.node.app!.developerName,
+        description: edge.node.app!.description,
+        developerWebsiteUrl: edge.node.app!.developerWebsiteUrl,
+      }))
+      .sort((a, b) => a.title.localeCompare(b.title));
+    return { apps, error: null };
+  });
