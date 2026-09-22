@@ -23,9 +23,11 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const claimOwner = useServerFn(claimOwnerAccess);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [setupToken, setSetupToken] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -47,7 +49,20 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-      await supabase.rpc("claim_first_admin");
+
+      if (setupToken.trim()) {
+        const result = await claimOwner({ data: { setupToken: setupToken.trim() } });
+        if (!result.ok) {
+          toast.error(
+            result.reason === "invalid_token"
+              ? "That owner setup code isn't right."
+              : result.reason === "already_claimed"
+                ? "Owner access has already been set up for another account."
+                : "Couldn't set up owner access. Try again.",
+          );
+        }
+      }
+
       navigate({ to: "/admin" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
