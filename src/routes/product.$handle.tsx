@@ -178,9 +178,15 @@ function ProductDetail({ product }: { product: ShopifyProduct }) {
           <p className="mt-8 text-sm leading-relaxed whitespace-pre-line text-muted-foreground">{node.description}</p>
         )}
 
-        <p className="mt-6 text-xs tracking-widest text-muted-foreground uppercase">
-          Printed on demand · Ships in 3-7 business days
-        </p>
+        <div className="mt-6 space-y-2 rounded border border-border p-4">
+          <p className="text-xs tracking-widest text-muted-foreground uppercase">
+            Made to order · Premium DTF print
+          </p>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Every piece is printed just for you and ships within 2–4 business days. Delivery
+            available across the US and Canada, with tracking emailed as soon as your order ships.
+          </p>
+        </div>
       </div>
     </div>
   );
