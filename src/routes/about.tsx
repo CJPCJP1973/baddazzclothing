@@ -29,7 +29,7 @@ const steps = [
   },
   {
     title: "It ships to you",
-    body: "Made-to-order items typically leave the print house in 3-7 business days, then travel with tracked shipping.",
+    body: "Made-to-order items are printed and shipped within 2–4 business days, then travel with tracked shipping across the US and Canada.",
   },
 ];
 
