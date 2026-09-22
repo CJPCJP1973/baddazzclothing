@@ -8,6 +8,13 @@
       "when": 1789792795026,
       "tag": "0000_create_user_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790055952474,
+      "tag": "0001_harden_admin_role_functions",
+      "breakpoints": true
     }
   ]
 }
