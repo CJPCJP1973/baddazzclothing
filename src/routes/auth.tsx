@@ -109,6 +109,22 @@ function AuthPage() {
               className="mt-1 w-full rounded border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
             />
           </div>
+          <div>
+            <label htmlFor="setupToken" className="text-xs tracking-widest text-muted-foreground uppercase">
+              Owner setup code (first time only)
+            </label>
+            <input
+              id="setupToken"
+              type="password"
+              autoComplete="off"
+              value={setupToken}
+              onChange={(e) => setSetupToken(e.target.value)}
+              className="mt-1 w-full rounded border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Leave blank unless you are setting up owner access for the first time.
+            </p>
+          </div>
           <button
             type="submit"
             disabled={busy}
