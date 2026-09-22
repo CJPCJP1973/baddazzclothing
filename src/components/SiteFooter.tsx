@@ -25,7 +25,7 @@ export function SiteFooter() {
         <div className="space-y-3 text-sm">
           <h3 className="font-display text-base">Good to know</h3>
           <p className="text-muted-foreground">
-            Orders are made to order and typically ship in 3-7 business days. Checkout, payments and shipping are
+            Orders are made to order and ship within 2–4 business days. Checkout, payments and shipping are
             handled securely through Shopify.
           </p>
         </div>
