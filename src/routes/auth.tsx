@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { claimOwnerAccess } from "@/lib/owner.functions";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
@@ -23,9 +25,11 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const claimOwner = useServerFn(claimOwnerAccess);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [setupToken, setSetupToken] = useState("");
   const [busy, setBusy] = useState(false);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -47,7 +51,20 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-      await supabase.rpc("claim_first_admin");
+
+      if (setupToken.trim()) {
+        const result = await claimOwner({ data: { setupToken: setupToken.trim() } });
+        if (!result.ok) {
+          toast.error(
+            result.reason === "invalid_token"
+              ? "That owner setup code isn't right."
+              : result.reason === "already_claimed"
+                ? "Owner access has already been set up for another account."
+                : "Couldn't set up owner access. Try again.",
+          );
+        }
+      }
+
       navigate({ to: "/admin" });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
@@ -91,6 +108,22 @@ function AuthPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 w-full rounded border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
             />
+          </div>
+          <div>
+            <label htmlFor="setupToken" className="text-xs tracking-widest text-muted-foreground uppercase">
+              Owner setup code (first time only)
+            </label>
+            <input
+              id="setupToken"
+              type="password"
+              autoComplete="off"
+              value={setupToken}
+              onChange={(e) => setSetupToken(e.target.value)}
+              className="mt-1 w-full rounded border border-border bg-card px-3 py-2 text-sm text-foreground outline-none focus:border-primary"
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Leave blank unless you are setting up owner access for the first time.
+            </p>
           </div>
           <button
             type="submit"

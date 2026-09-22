@@ -5,11 +5,13 @@ const ADMIN_API_VERSION = "2025-07";
 const STORE_DOMAIN = "mq9xvc-xc.myshopify.com";
 export const STORE_HANDLE = STORE_DOMAIN.replace(".myshopify.com", "");
 
-async function assertAdmin(context: { supabase: { rpc: Function }; userId: string }) {
-  const { data, error } = await context.supabase.rpc("has_role", {
-    _user_id: context.userId,
-    _role: "admin",
-  });
+async function assertAdmin(context: { supabase: any; userId: string }) {
+  const { data, error } = await context.supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", context.userId)
+    .eq("role", "admin")
+    .maybeSingle();
   if (error || !data) throw new Error("Forbidden");
 }
 
