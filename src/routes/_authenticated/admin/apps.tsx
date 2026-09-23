@@ -5,6 +5,7 @@ import { ExternalLink } from "lucide-react";
 
 import { listInstalledApps, STORE_HANDLE } from "@/lib/admin.functions";
 import { AdminError } from "@/components/AdminError";
+import { AppTroubleshooter } from "@/components/AppTroubleshooter";
 
 export const Route = createFileRoute("/_authenticated/admin/apps")({
   head: () => ({
@@ -77,6 +78,8 @@ function AppsPage() {
           </article>
         ))}
       </div>
+
+      <AppTroubleshooter appNames={apps.map((a) => a.title)} />
     </div>
   );
 }
